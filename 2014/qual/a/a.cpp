@@ -1,3 +1,4 @@
+// Works for both small and large inputs.
 #include <iostream>
 #include <cassert>
 using namespace std;
