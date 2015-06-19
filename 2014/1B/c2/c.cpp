@@ -3,12 +3,23 @@ using namespace std;
 
 typedef long long ll;
 #define dim 1330 
-ll zip[dim];
+struct z {
+  ll code;
+  ll status;
+  ll parent;
+};
+z zip[dim];
 ll verticies[dim][dim];
+string ans;
+
 
 void initialize () {
-  for (ll i = 0; i < dim; i++)
-    zip[i] = -1;
+  ans = "";
+  for (ll i = 0; i < dim; i++) {
+    zip[i].code = -1;
+    zip[i].status = 0;
+    zip[i].parent = -1;
+  }
   for (ll i = 0; i < dim; i++)
     for (ll j = 0; j < dim; j++)
       verticies[i][j] = -1;
@@ -19,7 +30,7 @@ void doit (ll cas) {
   ll M, N;
   cin >> M >> N;
   for (ll i = 0; i < M; i++)
-    cin >> zip[i + 1];
+    cin >> zip[i + 1].code;
   ll t1, t2;
   for (ll i = 0; i < N; i++) {
     cin >> t1 >> t2;
@@ -36,7 +47,8 @@ void doit (ll cas) {
   for (ll i = 0; i < dim; i++)
     if (zip[i] != -1 && zip[i] < zip[bestidx])
       bestidx = i;
-  cout << bestidx << endl;
+
+  recurse(bestidx);
 }
 
 int main () {
