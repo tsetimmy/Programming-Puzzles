@@ -1,17 +1,14 @@
 #include <iostream>
 #include <sstream>
 #include <cassert>
+#include <queue>
 using namespace std;
 
 typedef long long ll;
-#define dim 1330 
-struct z {
-  ll code;
-  ll status;
-  ll parent;
-};
-z zip[dim];
-z zip_copy[dim];
+#define dim 1330
+#define sixdig 999999
+ll zip[dim];
+ll status[dim];
 ll verticies[dim][dim];
 string ans;
 
@@ -23,115 +20,11 @@ string tostring (ll integer) {
   return ret;
 }
 
-ll get (ll idx) {
-  for (ll i = 0; i < dim; i++) {
-    if (verticies[idx][i] != -1 && zip[i].code != -1 && zip[i].status == 0) {
-      goto NEX;
-    }
-  }
-  return -1;
-
-  NEX:
-  ll bidx;
-  for (ll i = 0; i < dim; i++)
-    if (verticies[idx][i] != -1 && zip[i].code != -1 && zip[i].status == 0) {
-      bidx = i;
-      break;
-    }
-  for (ll i = 0; i < dim; i++)
-    if (verticies[idx][i] != -1 && zip[i].code != -1 && zip[i].status == 0 && zip[i].code < zip[bidx].code)
-      bidx = i;
-  return bidx;
-}
-
-ll get_next (ll curr) {
-  for (ll i = 0; i < dim; i++)
-    if (zip[i].code != -1 && zip[i].status == 0)
-      goto NEXT;
-  return -1;
-
-  NEXT:
-  ll bidx;
-  for (ll i = 0; i < dim; i++)
-    if (zip[i].code != -1 && zip[i].status == 0) {
-      bidx = i;
-      break;
-    }
-  for (ll i = 0; i < dim; i++)
-    if (zip[i].code != -1 && zip[i].status == 0 && zip[i].code < zip[bidx].code)
-      bidx = i;
-  return bidx;
-}
-
-void recurse_check (ll idx) {
-  assert(zip_copy[idx].code != -1);
-  assert(zip_copy[idx].status != 2);
-  zip_copy[idx].status = 2;
-  for (ll i = 0; i < dim; i++)
-    if (verticies[idx][i] != -1 && zip_copy[i].status != 2) {
-      assert(zip_copy[i].code != -1);
-      recurse_check(i);
-    }
-}
-
-bool check_connected (ll curr) {
-  for (ll i = 0; i < dim; i++) {
-    zip_copy[i].code = zip[i].code;
-    zip_copy[i].status = zip[i].status;
-    zip_copy[i].parent = zip[i].parent;
-  }
-  recurse_check(curr);
-  for (ll i = 0; i < dim; i++)
-    if (zip_copy[i].code != -1 && zip_copy[i].status != 2)
-      return false;
-  return true;
-}
-
-void recurse (ll idx, ll p) {
-  ans += tostring(zip[idx].code);
-  zip[idx].status++;
-
-  ll next;
-  while ((next = get_next(idx)) != -1) {
-    bool flag = false;
-    for (ll i = 0; i < dim; i++)
-      if (verticies[idx][i] == 1 && i == next) {
-        recurse(i, idx);
-        flag = true;
-        break;
-      }
-    if (p == -1 && flag == false) {
-      ll n;
-      while ((n = get(idx)) != -1) {
-        recurse(n, idx);
-      }
-    } else {
-      if (flag == false) {
-        ll curr_status = zip[idx].status;
-        zip[idx].status = 2; // DEAD status
-        bool connected = check_connected(p);
-        zip[idx].status = curr_status;
-        if (connected) {
-          zip[idx].status = 2;
-          return;
-        } else {
-          ll n;
-          while ((n = get(idx)) != -1) {
-            recurse(n, idx);
-          }
-        }
-      }
-    }
-  }
-  zip[idx].status = 2;
-}
-
 void initialize () {
   ans = "";
   for (ll i = 0; i < dim; i++) {
-    zip[i].code = -1;
-    zip[i].status = 0;
-    zip[i].parent = -1;
+    zip[i] = sixdig;
+    status[i] = 0;
   }
   for (ll i = 0; i < dim; i++)
     for (ll j = 0; j < dim; j++)
@@ -143,7 +36,7 @@ void doit (ll cas) {
   ll M, N;
   cin >> M >> N;
   for (ll i = 0; i < M; i++)
-    cin >> zip[i + 1].code;
+    cin >> zip[i + 1];
   ll t1, t2;
   for (ll i = 0; i < N; i++) {
     cin >> t1 >> t2;
@@ -151,17 +44,25 @@ void doit (ll cas) {
     verticies[t2][t1] = 1;
   }
 
-  ll bestidx;
+  ll curr_idx = 0;
   for (ll i = 0; i < dim; i++)
-    if (zip[i].code != -1) {
-      bestidx = i;
-      break;
-    }
-  for (ll i = 0; i < dim; i++)
-    if (zip[i].code != -1 && zip[i].code < zip[bestidx].code)
-     bestidx = i;
+    if (zip[i] < zip[curr_idx])
+      curr_idx = i;
 
-  recurse(bestidx, -1);
+  ll visited_count = 1;
+  queue<ll> q;
+  q.push(curr_idx);
+  status[curr_idx] = 1;
+  while (visited_count < M) {
+    ll curr = get_best_neighbour(curr_idx);
+    ll curr_status = status[curr_idx];
+    status[curr_idx] = 2;
+    if (q.size() > 1 && connected(q[q.size() - 2]) && zip[get_best_neighbour(q[q.size() - 2])] < zip[curr_idx]) {
+    } else {
+      status[curr_idx] = curr_status;
+    }
+
+  }
   cout << "Case #" << cas << ": " << ans << endl;
 }
 
