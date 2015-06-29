@@ -24,6 +24,7 @@ def doit (cas):
 
 tcases = input()
 tcases = int(tcases)
+print tcases
 
 for i in range(tcases):
   doit(i + 1)

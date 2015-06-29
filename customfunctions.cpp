@@ -48,3 +48,10 @@ void binomial_coefficient (int N, int K) {
     }
   }
 }
+
+int to_int (string s) {
+  istringstream buffer(s);
+  int value;
+  buffer >> value;
+  return value
+}
