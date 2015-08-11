@@ -45,6 +45,17 @@ int cross (pt u, pt v, int d) {
   return (u.x * v.y - u.y * v.x);
 }
 
+void remove_negatives () {
+  int i = 0;
+  while (i < pts.size()) {
+    if (pts[i].idx == -1) {
+      pts.erase(pts.begin() + i);
+    } else {
+      i++;
+    }
+  }
+}
+
 void doit (int cas) {
   cout << "Case #" << cas << ":" << endl;
   cin >> N;
@@ -65,65 +76,29 @@ void doit (int cas) {
   }
 
 
-  for (int i = 0; i < pts.size(); i++) {
-
-    for (int j = 0; j < pts.size(); j++) {
-      if (i != j) {
-        pts[j].angle = atan2l(pts[j].y - pts[i].y, pts[j].x - pts[i].x);
-      }
-    }
-    pts[i].angle = inf;
-
-    sort(pts.begin(), pts.end(), foo);
-
-
-
-    int h, tail;
-    bool flag = false;
+  for (int p = 0; p < pts.size(); p++) {
     for (int q = 0; q < pts.size(); q++) {
-      if (q == i)
-        continue;
+      if (p != q) {
+
+        pt pt_p = pts[p];
+        pt pt_q = pts[q];
+
+        pts[p].idx = -1;
+        pts[q].idx = -1;
+        remove_negatives();
+
+        for(int i = 0; i < pts.size(); i++)
+          pts[i].angle = atan2l(pts[i].y - pt_p.y, pts[i].x - pt_p.x);
+
+        pt phead, ptail;
+        int h, t;
 
 
 
-      for (int k = 0; k < pts.size(); k++) {
-        cout << pts[k].x << " " << pts[k].y << " " << pts[k].angle << endl;
       }
-      cout << "p: " << i << endl;
-      cout << "q: " << q << endl;
-      return;
-
-      pt pq = vectorize(pts[q], pts[i]);
-      h = q;
-      pt ph = pq;
-      while (cross(pq, ph, 0) >= 0) {
-        inc(h);
-        while (h == i) {
-          inc(h);
-        }
-        ph = vectorize(pts[h], pts[i]);
-        cout << "1" << endl;
-      }
-
-
-      if (!flag) {
-        flag = true;
-        tail = h;
-      }
-      pt ptail = vectorize(pts[tail], pts[i]);
-      while (cross(pq, ptail, 1) <= 0) {
-        inc(tail);
-        while (tail == i)
-          inc(tail);
-        ptail = vectorize(pts[tail], pts[i]);
-        cout << "2" << endl;
-      }
-
-      pts[i].best = min(pts[i].best, abs(tail - h));
     }
-
-
   }
+
   sort(pts.begin(), pts.end(), foo2);
   for (int i = 0; i < pts.size(); i++)
     cout << pts[i].angle << endl;
