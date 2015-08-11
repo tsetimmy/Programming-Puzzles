@@ -4,8 +4,6 @@
  */
 
 #include <bits/stdc++.h>
-#include <math.h>
-#include <stdio.h>
 
 using namespace std;
 
@@ -24,7 +22,7 @@ void solve() {
     int an = 0, ans = n - 1;
     forn(j, n)
       if (j != i)
-        a[an++] = std::atan2l(y[j] - y[i], x[j] - x[i]);
+        a[an++] = atan2l(y[j] - y[i], x[j] - x[i]);
     sort(a, a + an);
     forn(i, an)
       a[i + an] = a[i] + 2 * M_PI;
