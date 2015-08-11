@@ -21,11 +21,16 @@ struct pt {
 int N;
 vector<pt> pts;
 
-void fix (int & a, int i) {
-  if (a == i) {
-    a++;
-    a %= pts.size() - 1;
-  }
+void inc (int & a) {
+  a++;
+  a = a % pts.size();
+}
+
+pt vectorize (pt a, pt b) {
+  pt c;
+  c.x = a.x - b.x;
+  c.y = a.y - b.y;
+  return c;
 }
 
 bool foo (pt a, pt b) {
@@ -36,13 +41,12 @@ bool foo2 (pt a, pt b) {
   return (a.idx <= b.idx);
 }
 
-int cross (pt u, pt v) {
-  cout << "in the cross" << endl;
-  cout << (u.x * v.y - u.y * v.x) << endl;
+int cross (pt u, pt v, int d) {
   return (u.x * v.y - u.y * v.x);
 }
 
 void doit (int cas) {
+  cout << "Case #" << cas << ":" << endl;
   cin >> N;
   pts.clear();
   pts = vector<pt> (N);
@@ -53,6 +57,13 @@ void doit (int cas) {
     pts[i].best = 3001;
     pts[i].idx = i;
   }
+
+  if (N <= 4) {
+    for (int i = 0; i < N; i++)
+      cout << 0 << endl;
+    return;
+  }
+
 
   for (int i = 0; i < pts.size(); i++) {
 
@@ -67,25 +78,53 @@ void doit (int cas) {
 
 
 
-    int h, t;
-    for (int q = 0; q < pts.size() - 1; q++) {
-      pt pq;
-      pq.x = pts[q].x - pts[i].x;
-      pq.y = pts[q].y - pts[i].y;
+    int h, tail;
+    bool flag = false;
+    for (int q = 0; q < pts.size(); q++) {
+      if (q == i)
+        continue;
 
+
+
+      for (int k = 0; k < pts.size(); k++) {
+        cout << pts[k].x << " " << pts[k].y << " " << pts[k].angle << endl;
+      }
+      cout << "p: " << i << endl;
+      cout << "q: " << q << endl;
+      return;
+
+      pt pq = vectorize(pts[q], pts[i]);
       h = q;
-      while 
+      pt ph = pq;
+      while (cross(pq, ph, 0) >= 0) {
+        inc(h);
+        while (h == i) {
+          inc(h);
+        }
+        ph = vectorize(pts[h], pts[i]);
+        cout << "1" << endl;
+      }
 
+
+      if (!flag) {
+        flag = true;
+        tail = h;
+      }
+      pt ptail = vectorize(pts[tail], pts[i]);
+      while (cross(pq, ptail, 1) <= 0) {
+        inc(tail);
+        while (tail == i)
+          inc(tail);
+        ptail = vectorize(pts[tail], pts[i]);
+        cout << "2" << endl;
+      }
+
+      pts[i].best = min(pts[i].best, abs(tail - h));
     }
-
-
-
-    
 
 
   }
   sort(pts.begin(), pts.end(), foo2);
-  cout << "Case #" << cas << ":" << endl;
   for (int i = 0; i < pts.size(); i++)
     cout << pts[i].angle << endl;
 
