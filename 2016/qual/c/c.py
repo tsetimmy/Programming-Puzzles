@@ -1,9 +1,12 @@
+# Works for large inputs.
 import sys
+import time
 globalJ = 0
-N = 16
-J = 50
+N = 32
+J = 500
 
 def prime_checker(num):
+    start_time = time.time()
     if num % 2 == 0:
         return 2
     i = 3
@@ -11,6 +14,10 @@ def prime_checker(num):
         if num % i == 0:
             return i
         i += 2
+        elapsed_time = time.time() - start_time
+        if elapsed_time > 1:
+            print "timeout"
+            return -1
     return -1
 
 def convert_base(num, base):
@@ -25,6 +32,7 @@ def convert_base(num, base):
 
 def recurse(s):
     global globalJ
+    print "globalJ:" + str(globalJ)
     if globalJ == J:
         return
     if len(s) == N:
@@ -38,11 +46,15 @@ def recurse(s):
                 return
             else:
                 ans.append(p)
-        sys.stdout.write(str(s))
+        write = ""
+        write += str(s)
         for a in ans:
-            sys.stdout.write(" ")
-            sys.stdout.write(str(a))
-        sys.stdout.write("\n")
+            write += " " + str(a)
+        print write
+        target = open("./large.txt", "a+")
+        target.write(write)
+        target.write("\n")
+        target.close()
         globalJ += 1
         return
     else:
@@ -55,7 +67,6 @@ def recurse(s):
             s = s[:-1]
             s = s + "1"
             recurse(s)
-
 
 def doit():
     print "Case #1:"

@@ -1,3 +1,4 @@
+// Works for small inputs.
 #include <iostream>
 #include <vector>
 #include <cmath>
